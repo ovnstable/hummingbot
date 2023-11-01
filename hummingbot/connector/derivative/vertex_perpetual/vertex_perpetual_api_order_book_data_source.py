@@ -106,16 +106,17 @@ class VertexPerpetualAPIOrderBookDataSource(PerpetualAPIOrderBookDataSource):
         if not self._connector._exchange_info:
             await self._connector.build_exchange_info()
 
+        product_id = utils.trading_pair_to_product_id(trading_pair=trading_pair, exchange_market_info=self._connector._exchange_info, is_perp=True)
         _funding_info_response = {}
         funding_rate_request_structure = {
             "funding_rate": {
-                "product_id": utils.trading_pair_to_product_id(trading_pair=trading_pair, exchange_market_info=self._connector._exchange_info, is_perp=True)
+                "product_id": product_id
             }
         }
 
         price_request_structure = {
             "price": {
-                "product_id": utils.trading_pair_to_product_id(trading_pair=trading_pair, exchange_market_info=self._connector._exchange_info, is_perp=True)
+                "product_id": product_id
             }
         }
         """
@@ -141,12 +142,15 @@ class VertexPerpetualAPIOrderBookDataSource(PerpetualAPIOrderBookDataSource):
             path_url=CONSTANTS.INDEXER_PATH_URL,
             data=price_request_structure
         )
-        # update_time = funding_rate_data["update_time"]
-        midnight = (int(time.time() // 86400)) * 86400 + 86400.
+        update_time = int(funding_rate_data["update_time"])
+        # update_date_time = datetime.datetime.fromtimestamp(update_time)
+        # next_funding_time = update_date_time.hour + datetime.timedelta(hours=1)
+
+        next_funding_time = int((update_time % 360) + 360)
         _funding_info_response = {
             "index_price": utils.convert_from_x18(price_data["index_price_x18"]),
             "mark_price": utils.convert_from_x18(price_data["mark_price_x18"]),
-            "next_funding_utc_timestamp": int(midnight),
+            "next_funding_utc_timestamp": next_funding_time,
             "next_funding_rate": utils.convert_from_x18(funding_rate_data["funding_rate_x18"])
         }
 
@@ -176,9 +180,8 @@ class VertexPerpetualAPIOrderBookDataSource(PerpetualAPIOrderBookDataSource):
         """
         if not self._connector._exchange_info:
             await self._connector.build_exchange_info()
+
         product_id = utils.trading_pair_to_product_id(trading_pair=trading_pair, exchange_market_info=self._connector._exchange_info, is_perp=True)
-        if product_id == -1:
-            return None
 
         params = {
             "type": CONSTANTS.MARKET_LIQUIDITY_REQUEST_TYPE,

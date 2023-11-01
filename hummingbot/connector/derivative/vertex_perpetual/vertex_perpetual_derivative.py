@@ -394,7 +394,10 @@ class VertexPerpetualDerivative(PerpetualDerivativePyBase):
             try:
                 if rule == 0:
                     continue
-                trading_pair = utils.market_to_trading_pair(exchange_info_dict[rule]["market"]).replace("-PERP", "")
+                # TODO: Review
+                if "PERP" not in exchange_info_dict[rule]["market"]:
+                    continue
+                trading_pair = utils.market_to_trading_pair(exchange_info_dict[rule]["market"]).replace("-PERP", "PERP")
                 rule_set = trading_pair_rules[rule]["book_info"]
                 min_order_size = utils.convert_from_x18(rule_set.get("min_size"))
                 min_price_increment = utils.convert_from_x18(rule_set.get("price_increment_x18"))

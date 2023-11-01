@@ -39,6 +39,11 @@ CONTRACTS = {
     TESTNET_DOMAIN: "0x5956d6f55011678b2cab217cd21626f7668ba6c5",
 }
 
+INDEXER_URLS = {
+    DEFAULT_DOMAIN: "https://archive.prod.vertexprotocol.com/v1",
+    TESTNET_DOMAIN: "https://archive.test.vertexprotocol.com/v1"
+}
+
 CHAIN_IDS = {
     DEFAULT_DOMAIN: 42161,
     TESTNET_DOMAIN: 421613,

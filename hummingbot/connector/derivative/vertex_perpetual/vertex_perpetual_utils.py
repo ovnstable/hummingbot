@@ -32,6 +32,8 @@ def convert_timestamp(timestamp: Any) -> float:
 
 def trading_pair_to_product_id(trading_pair: str, exchange_market_info: Dict, is_perp: Optional[bool] = False) -> int:
     tp = trading_pair.replace("-PERP", "").replace("-", "/")
+    if is_perp:
+        tp = tp.replace("PERP", "")
     for product_id in exchange_market_info:
         if is_perp and "perp" not in exchange_market_info[product_id]["symbol"].lower():
             continue
